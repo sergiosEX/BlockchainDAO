@@ -24,7 +24,10 @@
 // const fs = require('fs');
 // const mnemonic = fs.readFileSync(".secret").toString().trim();
 
+const path = require("path");
+
 module.exports = {
+  contracts_build_directory: path.join(__dirname, "client/src/contracts"),
   /**
    * Networks define how you connect to your ethereum client and let you set the
    * defaults web3 uses to send transactions. If you don't specify one truffle
@@ -44,11 +47,11 @@ module.exports = {
     //
     development: {
       host: "127.0.0.1",
-      port: 22000, // was 8545
+      port: 9545,// for quorum: 22000, for truffle 9545, was 8545
       network_id: "*", // Match any network id
       gasPrice: 0,
       gas: 4500000,
-      type: "quorum" // needed for Truffle to support Quorum
+      //type: "quorum" // needed for Truffle to support Quorum
     }
     // Another network with more advanced options...
     // advanced: {
