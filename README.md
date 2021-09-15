@@ -344,3 +344,46 @@ class SetString extends React.Component {
 export default SetString;
 ```
 
+
+
+### Connecting to our quorum network
+
+```javascript
+// File: `truffle-config.js`
+
+development: {
+      host: "127.0.0.1",
+      port: 22000,// for quorum: 22000, for truffle 9545, was 8545
+      network_id: "*", // Match any network id
+      gasPrice: 0,
+      gas: 4500000,
+      type: "quorum" // needed for Truffle to support Quorum
+    }
+```
+
+```javascript
+// File: `./client/src/index.js`
+
+const options = {
+  contracts: [MyStringStore],
+  web3: {
+    fallback: {
+      type: "ws",
+      url: "ws://127.0.0.1:22000",
+    },
+  },
+};
+```
+
+
+
+Παμε metamask και προσθετουμε ενα καινουργιο network με rpc url το url του κομβου 1 του quorum network. Επίσης το chain id βρίσκεται στο "config" section του αρχείου `7nodes/genesis.json` 
+
+![image-20210915214420949](C:\Users\Dell_Laptop\AppData\Roaming\Typora\typora-user-images\image-20210915214420949.png)
+
+
+
+
+
+
+
