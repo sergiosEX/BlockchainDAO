@@ -857,13 +857,13 @@
     "5777": {
       "events": {},
       "links": {},
-      "address": "0x329b134BCA9FA54f0fD33452e8C7be6a6653D006",
-      "transactionHash": "0x1be8634a9e40694c6a1939efb8854e3726dc90c539cef8041da8f3fbfd79b8f0"
+      "address": "0x5ED7f3c808360e0e3E52A43f33dC5629b1a0669f",
+      "transactionHash": "0xba2254a2bc124e6752ad4d5a54a88b90ef80947db2c2ca9515c8bad195ce36d4"
     }
   },
   "schemaVersion": "3.4.1",
-  "updatedAt": "2021-09-15T18:16:18.830Z",
-  "networkType": "quorum",
+  "updatedAt": "2021-09-22T18:06:18.985Z",
+  "networkType": "ethereum",
   "devdoc": {
     "methods": {}
   },

@@ -2,6 +2,7 @@ import './App.css';
 import { Component } from 'react';
 import ReadString from "./ReadString";
 import SetString from "./SetString";
+import Vote from "./Vote";
 
 class App extends Component {
   state = { loading: true, drizzleState: null };
@@ -35,6 +36,10 @@ class App extends Component {
           drizzleState={this.state.drizzleState}
         />
         <SetString
+          drizzle={this.props.drizzle}
+          drizzleState={this.state.drizzleState}
+        />
+        <Vote
           drizzle={this.props.drizzle}
           drizzleState={this.state.drizzleState}
         />

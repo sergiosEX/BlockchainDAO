@@ -459,13 +459,13 @@
     "5777": {
       "events": {},
       "links": {},
-      "address": "0xea8877390885057DFD53d65A3D32e166E9D702Ad",
-      "transactionHash": "0xc2dfb66121a2cb3c7c95d84e28b15fca0b099fe62962d591e22b3e96e2cafbd8"
+      "address": "0x8a5Ec551398Cf92722716dcaE924A734b53066eB",
+      "transactionHash": "0xc1cc47d05bc589688a6a480988a93a09ddfee1a01c28513448d76fe796d6c502"
     }
   },
   "schemaVersion": "3.4.1",
-  "updatedAt": "2021-09-15T18:16:23.389Z",
-  "networkType": "quorum",
+  "updatedAt": "2021-09-22T18:06:19.492Z",
+  "networkType": "ethereum",
   "devdoc": {
     "methods": {}
   },

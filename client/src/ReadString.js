@@ -22,6 +22,7 @@ class ReadString extends React.Component {
     const myString = MyStringStore.myString[this.state.dataKey];
 
     // if it exists, then we display its value
+    // alert(JSON.stringify(myString))
     return <p>My stored string: {myString && myString.value}</p>;
   }
 }
