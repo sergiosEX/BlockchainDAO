@@ -20,12 +20,12 @@ contract Vote {
     Proposal[] public proposals;
     
     uint16 public numVotesLeft = 3;
-    /*TODO
-    *if(isFinished == true)
-    *μηδενισε τα voteCount
-    **/
+    
     function createVote() public  {   
-        voteExists = true;
+        uint len = proposals.length;
+        for(uint k = 0; k < len; k++){
+            proposals.pop();
+        }
         proposals.push(Proposal({
                 name: "Yes",
                 voteCount: 0
@@ -34,19 +34,22 @@ contract Vote {
                 name: "No",
                 voteCount: 0
             }));
+        voteExists = true;
+        message = "Vote created successfully!";
     }
     
     function postVote(uint proposal) public {
         Voter storage sender = voters[msg.sender];
         if(sender.voted){
             message = "Already voted.";
+        } else {
+            sender.voted = true;
+            sender.vote = proposal;
+            
+            numVotesLeft -= 1;
+            proposals[proposal].voteCount += 1;
+            message = "Voted successfully!";
         }
-        require(!sender.voted, "Already voted.");
-        sender.voted = true;
-        sender.vote = proposal;
-        
-        numVotesLeft -= 1;
-        proposals[proposal].voteCount += 1;
     }
 
     /** 
@@ -64,19 +67,22 @@ contract Vote {
         } else {
             isFinished = false;
         }
-        require(isFinished, "Vote not finished!");
 
-        uint winningProposal_;
-        voteExists = false;
-        uint winningVoteCount = 0;
-        for (uint p = 0; p < proposals.length; p++) {
-            if (proposals[p].voteCount > winningVoteCount) {
-                winningVoteCount = proposals[p].voteCount;
-                winningProposal_ = p;
+        if(!isFinished){
+            message = "Vote not finished!";
+            winnerName_ = "";
+        } else {
+            uint winningProposal_;
+            voteExists = false;
+            uint winningVoteCount = 0;
+            for (uint p = 0; p < proposals.length; p++) {
+                if (proposals[p].voteCount > winningVoteCount) {
+                    winningVoteCount = proposals[p].voteCount;
+                    winningProposal_ = p;
+                }
             }
+            message = "Vote is finished!";
+            winnerName_ = proposals[winningProposal_].name;
         }
-        
-        winnerName_ = proposals[winningProposal_].name;
-        return (winnerName_);
     }
 }
