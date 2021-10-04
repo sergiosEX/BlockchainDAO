@@ -2,7 +2,7 @@ import React from "react";
 
 class Vote extends React.Component {
 
-  state = { accountNum: 1, voteExistsHash: null, winningProposal: "", isFinishedHash: null, messageHash: null };
+  state = { accountNum: 1, voteExistsHash: null, winningProposal: "", isFinishedHash: null, messageHash: null, mYesHash: null, mNoHash: null};
 
   componentDidMount() {
     const { drizzle } = this.props;
@@ -12,10 +12,14 @@ class Vote extends React.Component {
     const voteExistsHash = contract.methods["voteExists"].cacheCall();
     const isFinishedHash = contract.methods["isFinished"].cacheCall();
     const messageHash = contract.methods["message"].cacheCall();
+    const mYesHash = contract.methods["mYes"].cacheCall();
+    const mNoHash = contract.methods["mNo"].cacheCall();
 
     this.setState({ voteExistsHash })
     this.setState({ isFinishedHash })
     this.setState({ messageHash })
+    this.setState({ mYesHash })
+    this.setState({ mNoHash })
   };
     
   createVote() {
@@ -59,6 +63,10 @@ class Vote extends React.Component {
     voteExists = Boolean(voteExists && voteExists.value);
     let message = Vote.message[this.state.messageHash];
     message = message && message.value;
+    let mYes = Vote.mYes[this.state.mYesHash];
+    mYes = mYes && mYes.value;
+    let mNo = Vote.mNo[this.state.mNoHash];
+    mNo = mNo && mNo.value;
     // return <p>Vote Exists: {value.toString()}</p>
     if (voteExists) {
       return(
@@ -69,6 +77,7 @@ class Vote extends React.Component {
           <button onClick={() => this.postVote(1)}>vote no</button>
           <button onClick={() => this.getWinningProposal()}>refresh</button>
           <button onClick={() => this.createVote()}>create vote</button>
+          <p>Board: Yes: {mYes} No:{mNo}</p>
         </div>
       )
     }
@@ -77,6 +86,7 @@ class Vote extends React.Component {
         <div>
           <p>My vote: {message}</p>
           <button onClick={() => this.createVote()}>create vote</button>
+          <p>Board: Yes: {mYes} No:{mNo}</p>
         </div>
       )
     }

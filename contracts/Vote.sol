@@ -15,11 +15,20 @@ contract Vote {
     bool public voteExists = false;
     bool public isFinished = false;
     string public message = "";
-    mapping(address => Voter) public voters;
+    uint public mYes = 0;
+    uint public mNo = 0;
+    
+    //TODO you should inherit the addresses from sign up
+    address org1 = 0x2C40BA2ff15411D8f94549996d4525b6E40c7036;
+    address org2 = 0xeAb6B637e9566003F5da8d29e0765E55a1C49874;
+    address org3 = 0xeDa41D794c549a0F8A613720A70359937b50e0ca;
+    address org4 = 0xa99bECF4f0fDB2B2466e716b949fDF941C27CC47;
 
+    mapping(address => Voter) public voters;
+    
     Proposal[] public proposals;
     
-    uint16 public numVotesLeft = 3;
+    uint16 public numVotesLeft = 4;
     
     function createVote() public  {   
         uint len = proposals.length;
@@ -36,6 +45,18 @@ contract Vote {
             }));
         voteExists = true;
         message = "Vote created successfully!";
+        mYes = proposals[0].voteCount;
+        mNo = proposals[1].voteCount;
+        
+        Voter storage sender = voters[org1];
+        sender.voted = false;
+        sender = voters[org2];
+        sender.voted = false;
+        sender = voters[org3];
+        sender.voted = false;
+        sender = voters[org4];
+        sender.voted = false;
+        numVotesLeft = 4;
     }
     
     function postVote(uint proposal) public {
@@ -49,6 +70,8 @@ contract Vote {
             numVotesLeft -= 1;
             proposals[proposal].voteCount += 1;
             message = "Voted successfully!";
+            mYes = proposals[0].voteCount;
+            mNo = proposals[1].voteCount;
         }
     }
 
@@ -70,6 +93,8 @@ contract Vote {
 
         if(!isFinished){
             message = "Vote not finished!";
+            mYes = proposals[0].voteCount;
+            mNo = proposals[1].voteCount;
             winnerName_ = "";
         } else {
             uint winningProposal_;
@@ -82,6 +107,8 @@ contract Vote {
                 }
             }
             message = "Vote is finished!";
+            mYes = proposals[0].voteCount;
+            mNo = proposals[1].voteCount;
             winnerName_ = proposals[winningProposal_].name;
         }
     }
