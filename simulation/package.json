@@ -1,0 +1,16 @@
+{
+  "name": "post_energy_data",
+  "version": "1.0.0",
+  "description": "",
+  "main": "postEnergyData.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@drizzle/store": "^1.5.3",
+    "@truffle/contract": "^4.3.37",
+    "web3": "^1.6.0"
+  },
+  "author": "",
+  "license": "ISC"
+}
