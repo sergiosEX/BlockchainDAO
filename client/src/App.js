@@ -31,14 +31,14 @@ class App extends Component {
     if (this.state.loading) return "Loading Drizzle...";
     return (
       <div className="App">
-        <ReadString
+        {/* <ReadString
           drizzle={this.props.drizzle}
           drizzleState={this.state.drizzleState}
         />
         <SetString
           drizzle={this.props.drizzle}
           drizzleState={this.state.drizzleState}
-        />
+        /> */}
         <Vote
           drizzle={this.props.drizzle}
           drizzleState={this.state.drizzleState}

@@ -1,95 +1,225 @@
-import React from "react";
+import 'bootstrap/dist/css/bootstrap.min.css';
+import React from 'react';
+import { Button, Container, Form, Card,  } from "react-bootstrap";
+import { VictoryAxis, VictoryLine, VictoryChart, VictoryTheme } from "victory";
 
 class Vote extends React.Component {
 
-  state = { accountNum: 1, voteExistsHash: null, winningProposal: "", isFinishedHash: null, messageHash: null, mYesHash: null, mNoHash: null};
+  state = { 
+    voteExistsHash: null, 
+    winningProposal: "", 
+    isFinishedHash: null, 
+    messageHash: null, 
+    mYesHash: null, 
+    mNoHash: null, 
+    day: "",
+    dayItems: [], 
+    energyDataDay: [],
+    energyDataMonth: []
+  };
 
   componentDidMount() {
-    const { drizzle } = this.props;
-    const contract = drizzle.contracts.Vote;
-
-    // let drizzle know we want to watch the `myString` method
-    const voteExistsHash = contract.methods["voteExists"].cacheCall();
-    const isFinishedHash = contract.methods["isFinished"].cacheCall();
-    const messageHash = contract.methods["message"].cacheCall();
-    const mYesHash = contract.methods["mYes"].cacheCall();
-    const mNoHash = contract.methods["mNo"].cacheCall();
-
-    this.setState({ voteExistsHash })
-    this.setState({ isFinishedHash })
-    this.setState({ messageHash })
-    this.setState({ mYesHash })
-    this.setState({ mNoHash })
+    const Vote = this.props.drizzle.contracts.Vote;
+    const voteExistsHash = Vote.methods["voteExists"].cacheCall();
+    const isFinishedHash = Vote.methods["isFinished"].cacheCall();
+    const messageHash = Vote.methods["message"].cacheCall();
+    const mYesHash = Vote.methods["mYes"].cacheCall();
+    const mNoHash = Vote.methods["mNo"].cacheCall();
+    this.setState({ voteExistsHash, isFinishedHash, messageHash, mYesHash, mNoHash })
+    
+    let dayItems = []
+    for(let i=1; i<31; i++)
+      dayItems[i] = i
+    this.setState({ dayItems })
   };
     
   createVote() {
-    const { drizzle, drizzleState } = this.props;
-    const contract = drizzle.contracts.Vote;
-    contract.methods["createVote"].cacheSend({
-      from: drizzleState.accounts[this.state.accountNum] // TODO : fix the number accordingly
-    });
+    this.props.drizzle.contracts.Vote.methods["createVote"].cacheSend({ from: this.props.drizzleState.accounts[0] });
   };
 
   postVote(proposal) {
-    const { drizzle, drizzleState } = this.props;
-    const contract = drizzle.contracts.Vote;
-    contract.methods["postVote"].cacheSend(proposal, {
-      from: drizzleState.accounts[this.state.accountNum]
-    });
-
+    this.props.drizzle.contracts.Vote.methods["postVote"].cacheSend(proposal, { from: this.props.drizzleState.accounts[0] });
   };
 
   getWinningProposal() {
-    const { drizzle, drizzleState } = this.props;
-    const contract = drizzle.contracts.Vote;
-    const { Vote } = this.props.drizzleState.contracts;
-    const winningProposal = contract.methods["getWinningProposal"].cacheSend({
-      from: drizzleState.accounts[this.state.accountNum]
-    });
-    
-    let isFinished = Vote.isFinished[this.state.isFinishedHash];
+    const { isFinishedHash }  = this.state
+    const drizzleState = this.props.drizzleState
+    const winningProposal = this.props.drizzle.contracts.Vote.methods["getWinningProposal"].cacheSend({ from: drizzleState.accounts[0] });
+
+    let isFinished = drizzleState.contracts.Vote.isFinished[isFinishedHash];
     isFinished = Boolean(isFinished && isFinished.value);
     
     if(isFinished){
-      this.setState({winningProposal:  winningProposal && winningProposal.value})
+      this.setState({ winningProposal:  winningProposal && winningProposal.value })
     } else {
-      this.setState({winningProposal: "Vote not finished!"})
+      this.setState({ winningProposal: "Vote not finished!" })
     }
   };
 
+  onSelectDay(event) {
+    let day = event.target.value
+    day = (day <= 9) ? ("0"+day) : day;
+    this.setState({ day })
+  }
+
+  getEnergyData = () => {
+    let energyDataDay = []
+    let daySum = 0
+    let energyDataMonth = []
+    for(let i= 1; i<=192; i++) {
+      try{
+        let dataPromise = this.props.drizzle.contracts.EnergyData.methods.getEnergyData(i).call()
+        dataPromise.then(data => {
+          let timestamp = data["0"]
+          let day = timestamp[6] + timestamp[7]
+          let time = timestamp[8] + timestamp[9] + ':' + timestamp[10] + timestamp[11]
+          let energy = parseInt(data["1"])
+          // alert("Timestamp= "+typeof(timestamp)+", Energy= "+typeof(energy))
+          // alert("Day="+day+" this.state.day="+this.state.day)
+          if (day == this.state.day)
+            energyDataDay.push({x: time, y: energy})
+          daySum += energy
+          if (time == "23:45"){
+            energyDataMonth.push({x: day, y: daySum/4})
+            daySum = 0
+          }
+        })
+      }catch(err){
+        alert("Error in getEnergyData:"+err);
+      }
+    }
+    console.log(energyDataDay);
+    console.log(energyDataMonth);
+    this.setState({
+        energyDataDay: energyDataDay,
+        energyDataMonth: energyDataMonth,
+    });
+  } 
+
   render() {
-    const { Vote } = this.props.drizzleState.contracts;
-    let voteExists = Vote.voteExists[this.state.voteExistsHash];
+    const { 
+      voteExistsHash, 
+      messageHash, 
+      mYesHash, 
+      mNoHash, 
+      winningProposal, 
+      dayItems, 
+      day, 
+      energyDataDay, 
+      energyDataMonth 
+    } = this.state;
+    // alert(voteExistsHash)
+    const Vote = this.props.drizzleState.contracts.Vote;
+    let voteExists = Vote.voteExists[voteExistsHash];
     voteExists = Boolean(voteExists && voteExists.value);
-    let message = Vote.message[this.state.messageHash];
+    let message = Vote.message[messageHash];
     message = message && message.value;
-    let mYes = Vote.mYes[this.state.mYesHash];
+    let mYes = Vote.mYes[mYesHash];
     mYes = mYes && mYes.value;
-    let mNo = Vote.mNo[this.state.mNoHash];
+    let mNo = Vote.mNo[mNoHash];
     mNo = mNo && mNo.value;
-    // return <p>Vote Exists: {value.toString()}</p>
-    if (voteExists) {
+
+    let A = () => {
+      if (voteExists) {
+        return (
+          <Container>
+            <p>Result: {winningProposal}</p>
+            <Button onClick={() => this.postVote(0)}>vote yes</Button>
+            <Button onClick={() => this.postVote(1)}>vote no</Button>
+            <Button onClick={() => this.getWinningProposal()}>refresh</Button>
+          </Container>
+        )
+      } else  {
+        return (<Container/>)
+      }
+    } 
+
+    let B = () => {
       return(
-        <div>
-          <p>My vote: {message}</p>
-          <p>Result: {this.state.winningProposal}</p>
-          <button onClick={() => this.postVote(0)}>vote yes</button>
-          <button onClick={() => this.postVote(1)}>vote no</button>
-          <button onClick={() => this.getWinningProposal()}>refresh</button>
-          <button onClick={() => this.createVote()}>create vote</button>
-          <p>Board: Yes: {mYes} No:{mNo}</p>
-        </div>
+        <Card>
+          <Form>
+            <Form.Label>Select a day !</Form.Label>
+            <Form.Control as="select" onChange={(e) => this.onSelectDay(e)}>
+              <option value={0} key={0}>Choose...</option>
+              {dayItems.map(item => 
+                  <option value={item} key={item}>{item}</option>
+              )}
+            </Form.Control>
+          </Form>
+          <Card.Header>
+            TODAY <br/>
+            Day: {day}, Month: January, Year: 2021
+          </Card.Header>
+          <Card.Body>
+            <VictoryChart theme={VictoryTheme.material}>
+              <VictoryAxis crossAxis
+                domain={[0, 96]}
+                label="time"
+                style={{tickLabels: {angle: 270, fontSize: 3}, axisLabel: {fontSize: 14, padding: 30}}}
+              />
+              <VictoryAxis dependentAxis crossAxis
+                label="Energy Power (MW)"
+                style={{tickLabels: {angle: 270, fontSize: 8}, axisLabel: {fontSize: 14, padding: 30}}}
+              />
+              <VictoryLine
+                style={{
+                    data: { stroke: "#c43a31" },
+                    parent: { border: "1px solid #ccc"}
+                }}
+                data={energyDataDay}
+              />
+            </VictoryChart>
+          </Card.Body>
+        </Card>
       )
     }
-    else 
-      return (
-        <div>
-          <p>My vote: {message}</p>
-          <button onClick={() => this.createVote()}>create vote</button>
-          <p>Board: Yes: {mYes} No:{mNo}</p>
-        </div>
+    
+    let C = () => {
+      return(
+        <Card>
+          <Card.Header>
+            THIS MONTH <br/>
+            Month: January, Year: 2021
+          </Card.Header>
+          <Card.Body>
+            <VictoryChart theme={VictoryTheme.material}>
+              <VictoryAxis crossAxis
+                domain={[0, 31]}
+                label="day"
+                style={{tickLabels: {angle: 270, fontSize: 3}, axisLabel: {fontSize: 14, padding: 30}}}
+              />
+              <VictoryAxis dependentAxis crossAxis
+                label="Average Energy Power (MW)"
+                style={{tickLabels: {angle: 270, fontSize: 8}, axisLabel: {fontSize: 14, padding: 30}}}
+              />
+              <VictoryLine
+                style={{
+                  data: { stroke: "#c43a31" },
+                  parent: { border: "1px solid #ccc"}
+                }}
+                data={energyDataMonth}
+              />
+            </VictoryChart>
+          </Card.Body>
+        </Card>
       )
     }
+    
+    return(
+      <Container>
+        <p>My vote: {message}</p>
+        <A/>
+        <Button onClick={() => this.createVote()}>create vote</Button>
+        <p>Board: Yes: {mYes} No:{mNo}</p>
+        <br/>
+        <Button onClick={() => this.getEnergyData()}>
+          fetch my energy data
+        </Button>
+        <B/>
+        <C/>
+      </Container>
+    )
+  }
 }
 
 export default Vote;

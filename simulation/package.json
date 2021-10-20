@@ -9,7 +9,9 @@
   "dependencies": {
     "@drizzle/store": "^1.5.3",
     "@truffle/contract": "^4.3.37",
-    "web3": "^1.6.0"
+    "node-fetch": "^3.0.0",
+    "web3": "^1.6.0",
+    "web3js-quorum": "^21.7.0-rc1"
   },
   "author": "",
   "license": "ISC"
