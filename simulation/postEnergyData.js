@@ -14,24 +14,25 @@ let contracts = {}
 contracts.EnergyData = TruffleContract(EnergyDataArtifact);
 contracts.EnergyData.setProvider(web3Provider);
 
-postEnergyData = () => {
-    let orgName = 'org1'        
+postEnergyData = async (orgName, account) => {
     let fileName = 'diploma.energy.data.' + orgName + '.csv'
-    fs.readFile(fileName, 'utf8', async (err,data) => {
-        if (err)  
-        return console.log(err)
-        let lines = data.split('\n')
-        lines = lines.slice(3)
-        for (let day=1; day<=2; day++){
-            await postEnergyDataPerDay(lines.slice(96*(day-1), 96*day))
-            await getCounter()
-            await getEnergyData()
-        }
-    })
+    let lines
+    try {
+        lines = fs.readFileSync(fileName, 'utf8')
+    } catch (err) {
+        console.error(err)
+    }
+    lines = lines.split('\n')
+    lines = lines.slice(3)
+    for (let day=1; day<=2; day++){
+        await postEnergyDataPerDay(lines.slice(96*(day-1), 96*day), account)
+        await getCounter()
+        await getEnergyData()
+    }
 
 }
 
-postEnergyDataPerDay = async (lines) => {
+postEnergyDataPerDay = async (lines, account) => {
     lines.forEach(  line => {
         let [timestamp, energy] = line.split('\n')[0].split(', ')
         try {
@@ -63,15 +64,19 @@ getEnergyData = async () => {
 }
 
 let EnergyDataInstance
-let account
 let k
 
 main = async () => {
     try {
         EnergyDataInstance = await contracts.EnergyData.deployed()
         let accounts = await web3.eth.getAccounts()
-        account = accounts[0]
-        await postEnergyData()
+        await postEnergyData('org1', accounts[0])
+        EnergyDataInstance = await contracts.EnergyData.deployed()
+        await postEnergyData('org2', accounts[1])
+        // EnergyDataInstance = await contracts.EnergyData.deployed()
+        // await postEnergyData('org3', accounts[2])
+        // EnergyDataInstance = await contracts.EnergyData.deployed()
+        // await postEnergyData('org4', accounts[3])
     } catch (err) {
         console.log(err);
     }

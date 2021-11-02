@@ -15,7 +15,7 @@ class Vote extends React.Component {
     day: "",
     dayItems: [], 
     energyDataDay: [],
-    energyDataMonth: []
+    energyDataMonth: [],
   };
 
   componentDidMount() {
@@ -56,45 +56,40 @@ class Vote extends React.Component {
     }
   };
 
-  onSelectDay(event) {
+  onSelectDay = (event) => {
     let day = event.target.value
     day = (day <= 9) ? ("0"+day) : day;
     this.setState({ day })
-  }
-
-  getEnergyData = () => {
+    this.getEnergyData()
+  } 
+  
+  getEnergyData = async() => {
     let energyDataDay = []
     let daySum = 0
     let energyDataMonth = []
-    for(let i= 1; i<=192; i++) {
+    for(let i= 1; i<=384; i++) {
       try{
-        let dataPromise = this.props.drizzle.contracts.EnergyData.methods.getEnergyData(i).call()
-        dataPromise.then(data => {
-          let timestamp = data["0"]
-          let day = timestamp[6] + timestamp[7]
-          let time = timestamp[8] + timestamp[9] + ':' + timestamp[10] + timestamp[11]
-          let energy = parseInt(data["1"])
-          // alert("Timestamp= "+typeof(timestamp)+", Energy= "+typeof(energy))
-          // alert("Day="+day+" this.state.day="+this.state.day)
-          if (day == this.state.day)
-            energyDataDay.push({x: time, y: energy})
-          daySum += energy
-          if (time == "23:45"){
-            energyDataMonth.push({x: day, y: daySum/4})
-            daySum = 0
-          }
-        })
+        let data = await this.props.drizzle.contracts.EnergyData.methods.getEnergyData(i).call()
+        let timestamp = data["0"]
+        let day = timestamp[6] + timestamp[7]
+        let time = timestamp[8] + timestamp[9] + ':' + timestamp[10] + timestamp[11]
+        let energy = parseInt(data["1"])
+        if (day == this.state.day)
+          energyDataDay.push({x: time, y: energy})
+        daySum += energy
+        if (time == "23:45"){
+          energyDataMonth.push({x: day, y: daySum/4})
+          daySum = 0
+        }
       }catch(err){
         alert("Error in getEnergyData:"+err);
       }
     }
-    console.log(energyDataDay);
-    console.log(energyDataMonth);
     this.setState({
-        energyDataDay: energyDataDay,
-        energyDataMonth: energyDataMonth,
-    });
-  } 
+      energyDataDay,
+      energyDataMonth
+    })
+  }
 
   render() {
     const { 
@@ -106,9 +101,9 @@ class Vote extends React.Component {
       dayItems, 
       day, 
       energyDataDay, 
-      energyDataMonth 
+      energyDataMonth,
     } = this.state;
-    // alert(voteExistsHash)
+    console.log(energyDataMonth);
     const Vote = this.props.drizzleState.contracts.Vote;
     let voteExists = Vote.voteExists[voteExistsHash];
     voteExists = Boolean(voteExists && voteExists.value);
@@ -133,19 +128,23 @@ class Vote extends React.Component {
         return (<Container/>)
       }
     } 
-
-    let B = () => {
-      return(
+    
+    return(
+      <Container>
+        <p>My vote: {message}</p>
+        <A/>
+        <Button onClick={() => this.createVote()}>create vote</Button>
+        <p>Board: Yes: {mYes} No:{mNo}</p>
+        <Form>
+          <Form.Label>Select a day !</Form.Label>
+          <Form.Control as="select" onChange={(e) => this.onSelectDay(e)}>
+            <option value={0} key={0}>Choose...</option>
+            {dayItems.map(item => 
+                <option value={item} key={item}>{item}</option>
+            )}
+          </Form.Control>
+        </Form>
         <Card>
-          <Form>
-            <Form.Label>Select a day !</Form.Label>
-            <Form.Control as="select" onChange={(e) => this.onSelectDay(e)}>
-              <option value={0} key={0}>Choose...</option>
-              {dayItems.map(item => 
-                  <option value={item} key={item}>{item}</option>
-              )}
-            </Form.Control>
-          </Form>
           <Card.Header>
             TODAY <br/>
             Day: {day}, Month: January, Year: 2021
@@ -171,11 +170,6 @@ class Vote extends React.Component {
             </VictoryChart>
           </Card.Body>
         </Card>
-      )
-    }
-    
-    let C = () => {
-      return(
         <Card>
           <Card.Header>
             THIS MONTH <br/>
@@ -202,21 +196,6 @@ class Vote extends React.Component {
             </VictoryChart>
           </Card.Body>
         </Card>
-      )
-    }
-    
-    return(
-      <Container>
-        <p>My vote: {message}</p>
-        <A/>
-        <Button onClick={() => this.createVote()}>create vote</Button>
-        <p>Board: Yes: {mYes} No:{mNo}</p>
-        <br/>
-        <Button onClick={() => this.getEnergyData()}>
-          fetch my energy data
-        </Button>
-        <B/>
-        <C/>
       </Container>
     )
   }
