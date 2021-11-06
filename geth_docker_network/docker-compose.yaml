@@ -1,0 +1,44 @@
+secrets:
+  boot.key:
+    file: ./secrets/boot.key
+  node-org1.password:
+    file: ./secrets/node-org1.password
+  node-org2.password:
+    file: ./secrets/node-org2.password
+
+services:
+  bootnode:
+    container_name: bootnode
+    image: ethereum/client-go:alltools-stable
+    command: /bin/sh -c "geth init /etc/network/blockchainDAO/genesis.json && bootnode --nodekey=/run/secrets/boot.key"
+    volumes: 
+      - ./genesis.json:/etc/network/blockchainDAO/genesis.json
+      - ./bootnode:/etc/network/blockchainDAO/bootnode
+    ports:
+      - 30301:30301
+    secrets:
+      - boot.key
+
+  node-org1:
+    container_name: node-org1
+    image: ethereum/client-go:alltools-stable
+    command: /bin/sh -c "geth init --datadir /etc/network/blockchainDAO/node-org1 /etc/network/blockchainDAO/genesis.json && geth --unlock `cat /etc/network/blockchainDAO/node-org1/node-org1.address` --password /run/secrets/node-org1.password --mine --networkid 1214 --datadir=/etc/network/blockchainDAO/node-org1 --bootnodes=enode://af22c29c316ad069cf48a09a4ad5cf04a251b411e45098888d114c6dd7f489a13786620d5953738762afa13711d4ffb3b19aa5de772d8af72f851f7e9c5b164a@bootnode:30301"
+    volumes: 
+      - ./genesis.json:/etc/network/blockchainDAO/genesis.json
+      - ./node-org1:/etc/network/blockchainDAO/node-org1
+    secrets:
+      - node-org1.password
+    depends_on:
+      - bootnode
+
+  node-org2:
+    container_name: node-org2
+    image: ethereum/client-go:alltools-stable
+    command: /bin/sh -c "geth init --datadir /etc/network/blockchainDAO/node-org2 /etc/network/blockchainDAO/genesis.json && geth --unlock `cat /etc/network/blockchainDAO/node-org2/node-org2.address` --password /run/secrets/node-org2.password --mine --networkid 1214 --datadir=/etc/network/blockchainDAO/node-org2 --bootnodes=enode://af22c29c316ad069cf48a09a4ad5cf04a251b411e45098888d114c6dd7f489a13786620d5953738762afa13711d4ffb3b19aa5de772d8af72f851f7e9c5b164a@bootnode:30301"
+    volumes: 
+      - ./genesis.json:/etc/network/blockchainDAO/genesis.json
+      - ./node-org2:/etc/network/blockchainDAO/node-org2
+    secrets:
+      - node-org2.password
+    depends_on:
+      - bootnode

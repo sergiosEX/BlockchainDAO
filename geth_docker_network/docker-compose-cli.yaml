@@ -1,0 +1,18 @@
+services:
+  cli:
+    container_name: cli
+    image: ethereum/client-go:alltools-stable
+    command: /bin/sh -c "geth account new --datadir /etc/network/blockchainDAO/node-org1 --password /run/secrets/node-org1.password && geth account new --datadir /etc/network/blockchainDAO/node-org2 --password /run/secrets/node-org2.password && while true; do sleep 1000; done"
+    # geth account new --datadir /etc/network/blockchainDAO/node-org1 --password /run/secrets/node-org1.password -> address=68c639e7e8a9888c875c0a46a6eb9cecf2639ade
+    # geth account new --datadir /etc/network/blockchainDAO/node-org2 --password /run/secrets/node-org2.password-> address=ca8678e947c341bf771c5c9c7faae81998eccab1
+    volumes: 
+      - .:/etc/network/blockchainDAO
+    secrets:
+      - node-org1.password
+      - node-org2.password
+
+secrets:
+  node-org1.password:
+    file: ./secrets/node-org1.password
+  node-org2.password:
+    file: ./secrets/node-org2.password
