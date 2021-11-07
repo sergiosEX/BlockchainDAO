@@ -52,7 +52,23 @@ module.exports = {
       gasPrice: 0,
       gas: 4500000,
       // type: "quorum" // needed for Truffle to support Quorum
-    }
+    },
+    geth_docker_network_org1: {
+      host: "127.0.0.1",
+      port: 8545,
+      network_id: 1214,
+      gasPrice: 0,
+      gas: 4500000,
+      // from: accounts[0]
+    },
+    // geth_docker_network_org2: {
+    //   host: "127.0.0.1",
+    //   port: 8545,
+    //   network_id: "1214",
+    //   gasPrice: 0,
+    //   gas: 4500000,
+    //   from: accounts[1]
+    // }
     // Another network with more advanced options...
     // advanced: {
     // port: 8777,             // Custom port
