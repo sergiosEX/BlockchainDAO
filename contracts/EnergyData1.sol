@@ -2,7 +2,7 @@
 
 pragma solidity ^0.5.16;
 
-contract EnergyData {
+contract EnergyData1 {
     struct energyDatum{
         string timestamp;
         string energy;

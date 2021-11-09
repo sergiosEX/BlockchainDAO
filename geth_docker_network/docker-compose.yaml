@@ -5,6 +5,10 @@ secrets:
     file: ./secrets/node-org1.password
   node-org2.password:
     file: ./secrets/node-org2.password
+  node-org3.password:
+    file: ./secrets/node-org3.password
+  node-org4.password:
+    file: ./secrets/node-org4.password
 
 services:
   bootnode:
@@ -22,12 +26,13 @@ services:
   node-org1:
     container_name: node-org1
     image: ethereum/client-go:alltools-stable
-    command: /bin/sh -c "geth init --datadir /etc/network/blockchainDAO/node-org1 /etc/network/blockchainDAO/genesis.json && geth --unlock `cat /etc/network/blockchainDAO/node-org1/node-org1.address` --password /run/secrets/node-org1.password --mine --allow-insecure-unlock --http --http.addr=0.0.0.0 --http.api="eth,web3,net,admin,personal,clique" --http.corsdomain="*" --networkid 1214 --datadir=/etc/network/blockchainDAO/node-org1 --bootnodes=enode://af22c29c316ad069cf48a09a4ad5cf04a251b411e45098888d114c6dd7f489a13786620d5953738762afa13711d4ffb3b19aa5de772d8af72f851f7e9c5b164a@bootnode:30301"
+    command: /bin/sh -c "geth init --datadir /etc/network/blockchainDAO/node-org1 /etc/network/blockchainDAO/genesis.json && geth --unlock `cat /etc/network/blockchainDAO/node-org1/node-org1.address` --password /run/secrets/node-org1.password --mine --allow-insecure-unlock --http --http.addr=0.0.0.0 -http.port=8541 --http.api="eth,web3,net,admin,personal,clique" --http.corsdomain="*" --ws --ws.addr=0.0.0.0 --ws.port=8551 --ws.api="eth,net,web3" --ws.origins="*" --networkid 1214 --datadir=/etc/network/blockchainDAO/node-org1 --bootnodes=enode://af22c29c316ad069cf48a09a4ad5cf04a251b411e45098888d114c6dd7f489a13786620d5953738762afa13711d4ffb3b19aa5de772d8af72f851f7e9c5b164a@bootnode:30301"
     volumes: 
       - ./genesis.json:/etc/network/blockchainDAO/genesis.json
       - ./node-org1:/etc/network/blockchainDAO/node-org1
     ports:
-      - "8545:8545"
+      - "8541:8541"
+      - "8551:8551"
     secrets:
       - node-org1.password
     depends_on:
@@ -36,11 +41,50 @@ services:
   node-org2:
     container_name: node-org2
     image: ethereum/client-go:alltools-stable
-    command: /bin/sh -c "geth init --datadir /etc/network/blockchainDAO/node-org2 /etc/network/blockchainDAO/genesis.json && geth --unlock `cat /etc/network/blockchainDAO/node-org2/node-org2.address` --password /run/secrets/node-org2.password --mine --networkid 1214 --datadir=/etc/network/blockchainDAO/node-org2 --bootnodes=enode://af22c29c316ad069cf48a09a4ad5cf04a251b411e45098888d114c6dd7f489a13786620d5953738762afa13711d4ffb3b19aa5de772d8af72f851f7e9c5b164a@bootnode:30301"
+    command: /bin/sh -c "geth init --datadir /etc/network/blockchainDAO/node-org2 /etc/network/blockchainDAO/genesis.json && geth --unlock `cat /etc/network/blockchainDAO/node-org2/node-org2.address` --password /run/secrets/node-org2.password --mine --allow-insecure-unlock --http --http.addr=0.0.0.0 -http.port=8542 --http.api="eth,web3,net,admin,personal,clique" --http.corsdomain="*" --ws --ws.addr=0.0.0.0 --ws.port=8552 --ws.api="eth,net,web3" --ws.origins="*" --networkid 1214 --datadir=/etc/network/blockchainDAO/node-org2 --bootnodes=enode://af22c29c316ad069cf48a09a4ad5cf04a251b411e45098888d114c6dd7f489a13786620d5953738762afa13711d4ffb3b19aa5de772d8af72f851f7e9c5b164a@bootnode:30301"
     volumes: 
       - ./genesis.json:/etc/network/blockchainDAO/genesis.json
       - ./node-org2:/etc/network/blockchainDAO/node-org2
+    ports:
+      - "8542:8542"
+      - "8552:8552"
     secrets:
       - node-org2.password
     depends_on:
       - bootnode
+      - node-org1
+    
+  node-org3:
+    container_name: node-org3
+    image: ethereum/client-go:alltools-stable
+    command: /bin/sh -c "geth init --datadir /etc/network/blockchainDAO/node-org3 /etc/network/blockchainDAO/genesis.json && geth --unlock `cat /etc/network/blockchainDAO/node-org3/node-org3.address` --password /run/secrets/node-org3.password --mine --allow-insecure-unlock --http --http.addr=0.0.0.0 -http.port=8543 --http.api="eth,web3,net,admin,personal,clique" --http.corsdomain="*" --ws --ws.addr=0.0.0.0 --ws.port=8553 --ws.api="eth,net,web3" --ws.origins="*" --networkid 1214 --datadir=/etc/network/blockchainDAO/node-org3 --bootnodes=enode://af22c29c316ad069cf48a09a4ad5cf04a251b411e45098888d114c6dd7f489a13786620d5953738762afa13711d4ffb3b19aa5de772d8af72f851f7e9c5b164a@bootnode:30301"
+    volumes: 
+      - ./genesis.json:/etc/network/blockchainDAO/genesis.json
+      - ./node-org3:/etc/network/blockchainDAO/node-org3
+    ports:
+      - "8543:8543"
+      - "8553:8553"
+    secrets:
+      - node-org3.password
+    depends_on:
+      - bootnode
+      - node-org1
+      - node-org2
+
+  node-org4:
+    container_name: node-org4
+    image: ethereum/client-go:alltools-stable
+    command: /bin/sh -c "geth init --datadir /etc/network/blockchainDAO/node-org4 /etc/network/blockchainDAO/genesis.json && geth --unlock `cat /etc/network/blockchainDAO/node-org4/node-org4.address` --password /run/secrets/node-org4.password --mine --allow-insecure-unlock --http --http.addr=0.0.0.0 -http.port=8544 --http.api="eth,web3,net,admin,personal,clique" --http.corsdomain="*" --ws --ws.addr=0.0.0.0 --ws.port=8554 --ws.api="eth,net,web3" --ws.origins="*" --networkid 1214 --datadir=/etc/network/blockchainDAO/node-org4 --bootnodes=enode://af22c29c316ad069cf48a09a4ad5cf04a251b411e45098888d114c6dd7f489a13786620d5953738762afa13711d4ffb3b19aa5de772d8af72f851f7e9c5b164a@bootnode:30301"
+    volumes: 
+      - ./genesis.json:/etc/network/blockchainDAO/genesis.json
+      - ./node-org4:/etc/network/blockchainDAO/node-org4
+    ports:
+      - "8544:8544"
+      - "8554:8554"
+    secrets:
+      - node-org4.password
+    depends_on:
+      - bootnode
+      - node-org1
+      - node-org2
+      - node-org3

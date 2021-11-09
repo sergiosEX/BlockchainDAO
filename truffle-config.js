@@ -55,11 +55,31 @@ module.exports = {
     },
     geth_docker_network_org1: {
       host: "127.0.0.1",
-      port: 8545,
+      port: 8541,
       network_id: 1214,
       gasPrice: 0,
       gas: 4500000,
-      // from: accounts[0]
+    },
+    geth_docker_network_org2: {
+      host: "127.0.0.1",
+      port: 8542,
+      network_id: 1214,
+      gasPrice: 0,
+      gas: 4500000,
+    },
+    geth_docker_network_org3: {
+      host: "127.0.0.1",
+      port: 8543,
+      network_id: 1214,
+      gasPrice: 0,
+      gas: 4500000,
+    },
+    geth_docker_network_org4: {
+      host: "127.0.0.1",
+      port: 8544,
+      network_id: 1214,
+      gasPrice: 0,
+      gas: 4500000,
     },
     // geth_docker_network_org2: {
     //   host: "127.0.0.1",
