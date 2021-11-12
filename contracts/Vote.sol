@@ -19,10 +19,10 @@ contract Vote {
     uint public mNo = 0;
     
     //TODO you should inherit the addresses from sign up
-    address org1 = 0x2C40BA2ff15411D8f94549996d4525b6E40c7036;
-    address org2 = 0xeAb6B637e9566003F5da8d29e0765E55a1C49874;
-    address org3 = 0xeDa41D794c549a0F8A613720A70359937b50e0ca;
-    address org4 = 0xa99bECF4f0fDB2B2466e716b949fDF941C27CC47;
+    address org1 = 0xa7e2d1F80B92b75B3fd187490b2b01550043D0b3;
+    address org2 = 0xa02A9A8D092a47dc4E7ABf569a9b392D0Ce07e43;
+    address org3 = 0x448F178C88C0fC73eA74714b1e0494781548ff4C;
+    address org4 = 0x7188D086E0415B0b394a67325Fc5c4534262e76a;
 
     mapping(address => Voter) public voters;
     
