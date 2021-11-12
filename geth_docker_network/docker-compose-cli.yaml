@@ -2,11 +2,12 @@ services:
   cli:
     container_name: cli
     image: ethereum/client-go:alltools-stable
-    command: /bin/sh -c "geth account new --datadir /etc/network/blockchainDAO/node-org1 --password /run/secrets/node-org1.password && geth account new --datadir /etc/network/blockchainDAO/node-org2 --password /run/secrets/node-org2.password && geth account new --datadir /etc/network/blockchainDAO/node-org3 --password /run/secrets/node-org3.password && geth account new --datadir /etc/network/blockchainDAO/node-org4 --password /run/secrets/node-org4.password && while true; do sleep 1000; done"
+    command: /bin/sh -c "geth account import --datadir /etc/network/blockchainDAO/node-org1 --password /run/secrets/node-org1.password /run/secrets/node-org1.key && geth account new --datadir /etc/network/blockchainDAO/node-org2 --password /run/secrets/node-org2.password && geth account new --datadir /etc/network/blockchainDAO/node-org3 --password /run/secrets/node-org3.password && geth account new --datadir /etc/network/blockchainDAO/node-org4 --password /run/secrets/node-org4.password && while true; do sleep 1000; done"
     volumes: 
       - .:/etc/network/blockchainDAO
     secrets:
       - node-org1.password
+      - node-org1.key
       - node-org2.password
       - node-org3.password
       - node-org4.password
@@ -14,6 +15,8 @@ services:
 secrets:
   node-org1.password:
     file: ./secrets/node-org1.password
+  node-org1.key:
+    file: ./secrets/node-org1.key
   node-org2.password:
     file: ./secrets/node-org2.password
   node-org3.password:

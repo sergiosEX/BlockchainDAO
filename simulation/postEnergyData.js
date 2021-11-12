@@ -6,6 +6,7 @@ const fs = require("fs");
 // let EnergyDataArtifact = EnergyData;
 // let contracts = {}
 // contracts.EnergyData = TruffleContract(EnergyDataArtifact);
+sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
 setPrerequisites = async (port, contractFile) => {
     // let web3Provider = 'ws://localhost:9545';
@@ -22,7 +23,7 @@ setPrerequisites = async (port, contractFile) => {
     EnergyDataInstance = await contracts.EnergyData.deployed()
 }
 
-postEnergyData = async () => {
+postEnergyData = async (orgName) => {
     let fileName = 'diploma.energy.data.' + orgName + '.csv'
     let lines
     try {
@@ -32,8 +33,9 @@ postEnergyData = async () => {
     }
     lines = lines.split('\n')
     lines = lines.slice(3)
-    for (let day=1; day<=2; day++){
+    for (let day=1; day<=5; day++){
         await postEnergyDataPerDay(lines.slice(96*(day-1), 96*day))
+        sleep(1000)
     }
     
 }
@@ -58,8 +60,8 @@ getCounter = async () => {
     }
 }
 
-getEnergyData = async () => {
-    for(let i= 1; i<= 192; i++) {
+getEnergyData = async (from, to) => {
+    for(let i= from+1; i<= to; i++) {
         try{
             console.log(await EnergyDataInstance.getEnergyData(i));
         }catch(err){
@@ -68,37 +70,46 @@ getEnergyData = async () => {
     }
 }
 
+
 let k
-let orgName 
 let account
 let EnergyDataInstance
 let contracts = {}
-
-sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms))
+let config = {
+    "org1" : {
+        port: 8551,
+        file:"EnergyData.json"
+    },
+    "org2" : {
+        port: 8552,
+        file:"EnergyData1.json"
+    },
+    "org3" : {
+        port: 8553,
+        file:"EnergyData2.json"
+    },
+    "org4" : {
+        port: 8554,
+        file:"EnergyData3.json"
+    }
+}
 
 main = async () => {
     let args = process.argv.slice(2)
     if (args.length != 1)
     console.log("Error: please give organization name as argument")
     else if (args[0] == 'org1' || args[0] == 'org2' || args[0] == 'org3' || args[0] == 'org4') {
-        orgName = args[0]    
-        let port
-        if (orgName == 'org1'){
-            await setPrerequisites(8551, "EnergyData.json")
-        } else if (orgName == 'org2'){
-            await setPrerequisites(8552, "EnergyData1.json")
-        } else if (orgName == 'org3'){
-            await setPrerequisites(8553, "EnergyData2.json")
-        } else if (orgName == 'org4'){
-            await setPrerequisites(8554, "EnergyData3.json")
-        } try {
-            await postEnergyData()   
+        try {
+            let { port, file } = config[args[0]]  
+            await setPrerequisites(port, file)
+            await postEnergyData(args[0])   
             await getCounter()
-            while (k < 192){
-                sleep(1000)
+            while (k < 96*5){
+                let old_k = k
+                sleep(5000)
                 await getCounter()
+                await getEnergyData(old_k, k)
             }
-            await getEnergyData()
         } catch (err) {
             console.log(err);
         }

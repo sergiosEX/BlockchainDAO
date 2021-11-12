@@ -1,4 +1,3 @@
-import './App.css';
 import { Component } from 'react';
 import ReadString from "./ReadString";
 import SetString from "./SetString";

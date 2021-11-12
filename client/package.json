@@ -16,7 +16,10 @@
     "web-vitals": "^1.1.2"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start1": "REACT_APP_PORT=8551 && REACT_APP_SM_FILE=EnergyData.json && react-scripts start",
+    "start2": "react-scripts start",
+    "start3": "react-scripts start",
+    "start4": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
