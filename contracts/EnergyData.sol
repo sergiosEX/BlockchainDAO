@@ -8,8 +8,8 @@ contract EnergyData {
         string energy;
     }
 
-    mapping(uint256 => energyDatum) public energyData;
-    uint256 public counter = 0;
+    mapping(uint => energyDatum) public energyData;
+    uint public counter = 0;
     address private owner;
 
     constructor() public{
