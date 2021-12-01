@@ -58,24 +58,27 @@ class App extends React.Component {
         dayItems[i] = i
         this.setState({ dayItems })
 
-        let energyPercentage = await VoteInstance.getEnergyPercentage();
+        let energyPercentage = await VoteInstance.getEnergyPercentage(account);
         energyPercentage = parseInt(String(energyPercentage))
-        console.log(energyPercentage, typeof(energyPercentage));
+        console.log("energyPercentage:"+energyPercentage);
         this.setState({ energyPercentage })
 
-        let lastMonthEnergySum = await VoteInstance.getEnergySum();
+        let lastMonthEnergySum = await VoteInstance.getEnergySum(account);
+        console.log("lastMonthEnergySum before:"+lastMonthEnergySum);
         if (lastMonthEnergySum == 0) {
-            await this.getEnergyData()
+            await this.getEnergyData() 
             let energySum = 0;
             let { energyDataMonth } = this.state;
             for (let index in energyDataMonth){
                 let item = energyDataMonth[index]
-                console.log(item.y);
                 energySum += item.y;
             }
             energySum = Math.round(energySum)
+            console.log("this.state.energySum:"+energySum, typeof(energySum));
             this.setState( { energySum })
             await VoteInstance.setEnergySum(energySum, {from: account})
+            lastMonthEnergySum = await VoteInstance.getEnergySum(account);
+            console.log("lastMonthEnergySum after:"+lastMonthEnergySum);
         }
 
         await this.updateState()
@@ -91,9 +94,10 @@ class App extends React.Component {
         mYes = parseInt(mYes)
         let mNo = await VoteInstance.mNo()
         mNo = parseInt(mNo)
-        let energyPercentage = await VoteInstance.getEnergyPercentage()
+        let account = this.state.account;
+        let energyPercentage = await VoteInstance.getEnergyPercentage(account)
         energyPercentage = parseInt(String(energyPercentage))
-        console.log(energyPercentage);
+        console.log("energyPercentage in updateState:"+energyPercentage);
         
         this.setState({ voteExists, message, mYes, mNo, winnerProposalName, energyPercentage })
     }
@@ -184,7 +188,7 @@ class App extends React.Component {
                     <ButtonGroup>
                         <Button onClick={() => this.postVote(0)}>vote yes</Button>
                         <Button onClick={() => this.postVote(1)}>vote no</Button>
-                        <Button onClick={() => this.updateVoteState()}>refresh</Button>
+                        <Button onClick={() => this.updateVoteState()}>refresh vote</Button>
                     </ButtonGroup>
                 </Container>
             )
@@ -205,6 +209,7 @@ class App extends React.Component {
                     <p>My vote: {message}</p>
                     <A/>
                     <Button onClick={() => this.createVote()}>create vote</Button>
+                    <Button onClick={() => this.updateState()}>refresh</Button>
                     <p>Board: Yes: {mYes} No:{mNo}</p>
                     <Form>
                     <Form.Label>Select a day !</Form.Label>

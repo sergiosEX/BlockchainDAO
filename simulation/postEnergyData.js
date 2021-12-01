@@ -33,7 +33,7 @@ postEnergyData = async (orgName) => {
     }
     lines = lines.split('\n')
     lines = lines.slice(3)
-    for (let day=1; day<=31; day++){
+    for (let day=1; day<=5; day++){
         await postEnergyDataPerDay(lines.slice(96*(day-1), 96*day))
         sleep(1000)
     }
@@ -104,7 +104,7 @@ main = async () => {
             await setPrerequisites(port, file)
             await postEnergyData(args[0])   
             await getCounter()
-            while (k < 96*31){
+            while (k < 96*5){
                 let old_k = k
                 sleep(5000)
                 await getCounter()
