@@ -3,14 +3,9 @@ const Web3 = require("web3")
 const TruffleContract = require("@truffle/contract");
 const fs = require("fs");
 
-// let EnergyDataArtifact = EnergyData;
-// let contracts = {}
-// contracts.EnergyData = TruffleContract(EnergyDataArtifact);
 sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
 setPrerequisites = async (port, contractFile) => {
-    // let web3Provider = 'ws://localhost:9545';
-    // let web3Provider = 'http://localhost:22000';
     const EnergyData = require("../client/src/contracts/"+contractFile)
     let web3Provider = 'ws://localhost:'+port;
     let web3 = new Web3(web3Provider);
@@ -33,7 +28,7 @@ postEnergyData = async (orgName) => {
     }
     lines = lines.split('\n')
     lines = lines.slice(3)
-    for (let day=1; day<=5; day++){
+    for (let day=1; day<=31; day++){
         await postEnergyDataPerDay(lines.slice(96*(day-1), 96*day))
         sleep(1000)
     }
@@ -104,7 +99,7 @@ main = async () => {
             await setPrerequisites(port, file)
             await postEnergyData(args[0])   
             await getCounter()
-            while (k < 96*5){
+            while (k < 96*31){
                 let old_k = k
                 sleep(5000)
                 await getCounter()

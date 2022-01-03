@@ -3,6 +3,9 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import React from 'react';
 import { ButtonGroup , Button, Container, Row, Col, Form, Card, Nav, Navbar } from "react-bootstrap";
 import { VictoryAxis, VictoryLine, VictoryChart, VictoryTheme } from "victory";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+
 
 const Web3 = require("web3")
 const TruffleContract = require("@truffle/contract");
@@ -14,11 +17,11 @@ let url = 'ws://localhost:'+port;
 class App extends React.Component {
 
     state = { 
-        day: "",
+        // day: "",
         account: "", 
         EnergyDataInstance: {},
         VoteInstance: {},
-        dayItems: [], 
+        // dayItems: [], 
         energyDataDay: [],
         energyDataMonth: [],
         voteExists: false,
@@ -28,7 +31,11 @@ class App extends React.Component {
         mNo: 0,
         energyPercentage: 0,
         energySum: 0,
-        loading: true
+        loading: true,
+        selectedDate: new Date(),
+        selectedDay: '',
+        selectedMonth: '', 
+        selectedYear: ''
     };
 
     componentDidMount = async () => {
@@ -53,10 +60,11 @@ class App extends React.Component {
         let EnergyDataInstance = await contracts.EnergyData.deployed()
         this.setState({ account, EnergyDataInstance, VoteInstance })
 
-        let dayItems = []
-        for(let i=1; i<31; i++)
-        dayItems[i] = i
-        this.setState({ dayItems })
+        // let dayItems = []
+        // for(let i=1; i<31; i++)
+        // dayItems[i] = i
+        // this.setState({ dayItems })
+        this.setDate(this.state.selectedDate)
 
         let energyPercentage = await VoteInstance.getEnergyPercentage(account);
         energyPercentage = parseInt(String(energyPercentage))
@@ -120,15 +128,15 @@ class App extends React.Component {
         this.updateState()
     };
 
-    onSelectDay = async(event) => {
-        let day = event.target.value
-        day = (day <= 9) ? ("0"+day) : day;
-        await this.setState({ day })
-        this.getEnergyData()
-    } 
+    // onSelectDay = async(event) => {
+    //     let day = event.target.value
+    //     day = (day <= 9) ? ("0"+day) : day;
+    //     await this.setState({ day })
+    //     this.getEnergyData()
+    // } 
   
     getEnergyData = async() => {
-        let { EnergyDataInstance, day } = this.state
+        let { EnergyDataInstance } = this.state
         let energyDataDay = []
         let dayInt
         let dayEnergySum = new Array(31).fill(0);
@@ -141,7 +149,7 @@ class App extends React.Component {
                 let day_tmp = timestamp[6] + timestamp[7]
                 let time = timestamp[8] + timestamp[9] + ':' + timestamp[10] + timestamp[11]
                 let energy = parseInt(data["1"])
-                if (day_tmp == day)
+                if (day_tmp == this.state.selectedDay)
                     energyDataDay.push({x: time, y: energy})
                 dayInt = parseInt(day_tmp)
                 dayEnergySum[dayInt-1] += energy
@@ -162,12 +170,18 @@ class App extends React.Component {
         console.log(dayCounter);
         this.setState({ energyDataDay, energyDataMonth })
     }
+    
+    setDate(selectedDate) {
+        var selectedDay = String(selectedDate.getDate()).padStart(2, '0');
+        let selectedMonth = String(selectedDate.getMonth() + 1).padStart(2, '0');
+        let selectedYear = selectedDate.getFullYear();
+        this.setState({ selectedDate, selectedDay, selectedMonth, selectedYear })
+        this.getEnergyData()
+    }
 
     render() {
         let {
-            winnerProposalName, 
-            dayItems, 
-            day, 
+            winnerProposalName,
             energyDataDay, 
             energyDataMonth,
             voteExists, 
@@ -176,7 +190,11 @@ class App extends React.Component {
             mNo,
             account,
             energyPercentage,
-            loading
+            loading,
+            selectedDay, 
+            selectedDate, 
+            selectedMonth, 
+            selectedYear
         } = this.state
 
 
@@ -211,70 +229,64 @@ class App extends React.Component {
                     <Button onClick={() => this.createVote()}>create vote</Button>
                     <Button onClick={() => this.updateState()}>refresh</Button>
                     <p>Board: Yes: {mYes} No:{mNo}</p>
-                    <Form>
-                    <Form.Label>Select a day !</Form.Label>
-                    <Form.Control as="select" onChange={(e) => this.onSelectDay(e)}>
-                        <option value={0} key={0}>Choose...</option>
-                        {dayItems.map(item => 
-                            <option value={item} key={item}>{item}</option>
-                        )}
-                    </Form.Control>
-                    </Form>
+                    Please select a Date:
+                    <DatePicker selected={selectedDate} onChange={(date) => this.setDate(date)} />
+                    <br/><br/>
                     <Row >
                         <Col sm={6}>
                             <Card>
-                            <Card.Header>
-                                TODAY <br/>
-                                Day: {day}, Month: January, Year: 2021
-                            </Card.Header>
-                            <Card.Body>
-                                <VictoryChart theme={VictoryTheme.material}>
-                                <VictoryAxis crossAxis
-                                    domain={[0, 96]}
-                                    label="time"
-                                    style={{tickLabels: {angle: 270, fontSize: 3}, axisLabel: {fontSize: 14, padding: 30}}}
-                                    />
-                                <VictoryAxis dependentAxis crossAxis
-                                    label="Energy Power (MW)"
-                                    style={{tickLabels: {angle: 270, fontSize: 8}, axisLabel: {fontSize: 14, padding: 30}}}
-                                    />
-                                <VictoryLine
-                                    style={{
-                                        data: { stroke: "#c43a31" },
-                                        parent: { border: "1px solid #ccc"}
-                                    }}
-                                    data={energyDataDay}
-                                    />
-                                </VictoryChart>
-                            </Card.Body>
+                                <Card.Header>
+                                    THIS DAY <br/>
+                                    Day: {selectedDay}, Month: {selectedMonth}, Year: {selectedYear}
+                                </Card.Header>
+                                <Card.Body>
+                                    <VictoryChart theme={VictoryTheme.material}>
+                                        <VictoryAxis crossAxis
+                                            domain={[0, 96]}
+                                            label="time"
+                                            style={{tickLabels: {angle: 270, fontSize: 3}, axisLabel: {fontSize: 14, padding: 30}}}
+                                            />
+                                        <VictoryAxis dependentAxis crossAxis
+                                            label="Energy Power (MW)"
+                                            style={{tickLabels: {angle: 270, fontSize: 8}, axisLabel: {fontSize: 14, padding: 30}}}
+                                            />
+                                        <VictoryLine
+                                            style={{
+                                                data: { stroke: "#c43a31" },
+                                                parent: { border: "1px solid #ccc"}
+                                            }}
+                                            data={energyDataDay}
+                                        />
+                                    </VictoryChart>
+                                </Card.Body>
                             </Card>
                         </Col>
                         <Col sm={6}>
                             <Card>
-                            <Card.Header>
-                                THIS MONTH <br/>
-                                Month: January, Year: 2021
-                            </Card.Header>
-                            <Card.Body>
-                                <VictoryChart theme={VictoryTheme.material}>
-                                <VictoryAxis crossAxis
-                                    domain={[0, 31]}
-                                    label="day"
-                                    style={{tickLabels: {angle: 270, fontSize: 3}, axisLabel: {fontSize: 14, padding: 30}}}
-                                />
-                                <VictoryAxis dependentAxis crossAxis
-                                    label="Average Energy Power (MW)"
-                                    style={{tickLabels: {angle: 270, fontSize: 8}, axisLabel: {fontSize: 14, padding: 30}}}
-                                />
-                                <VictoryLine
-                                    style={{
-                                    data: { stroke: "#c43a31" },
-                                    parent: { border: "1px solid #ccc"}
-                                    }}
-                                    data={energyDataMonth}
-                                    />
-                                </VictoryChart>
-                            </Card.Body>
+                                <Card.Header>
+                                    THIS MONTH <br/>
+                                    Month: {selectedMonth}, Year: {selectedYear}
+                                </Card.Header>
+                                <Card.Body>
+                                    <VictoryChart theme={VictoryTheme.material}>
+                                        <VictoryAxis crossAxis
+                                            domain={[0, 31]}
+                                            label="day"
+                                            style={{tickLabels: {angle: 270, fontSize: 3}, axisLabel: {fontSize: 14, padding: 30}}}
+                                        />
+                                        <VictoryAxis dependentAxis crossAxis
+                                            label="Average Energy Power (MW)"
+                                            style={{tickLabels: {angle: 270, fontSize: 8}, axisLabel: {fontSize: 14, padding: 30}}}
+                                        />
+                                        <VictoryLine
+                                            style={{
+                                            data: { stroke: "#c43a31" },
+                                            parent: { border: "1px solid #ccc"}
+                                            }}
+                                            data={energyDataMonth}
+                                        />
+                                    </VictoryChart>
+                                </Card.Body>
                             </Card>
                         </Col>
                     </Row>

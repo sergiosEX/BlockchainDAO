@@ -5044,12 +5044,12 @@
     "1214": {
       "events": {},
       "links": {},
-      "address": "0x06F0eaD0561F3c1ab47ae7b011DB13B64Ab49316",
-      "transactionHash": "0x4b89105bc4e53442dd2f651628b03142830e53db688102cb9b8971a2ae8f2336"
+      "address": "0x577eFd5CC9CBa6e67d4A0184B74C070a4d320b1A",
+      "transactionHash": "0x3aeea32e6d8fc636d29046183c759927a4be7af18fc53b74573397b68f85e93a"
     }
   },
   "schemaVersion": "3.4.1",
-  "updatedAt": "2021-12-01T18:11:38.085Z",
+  "updatedAt": "2022-01-03T16:39:39.315Z",
   "networkType": "ethereum",
   "devdoc": {
     "methods": {}

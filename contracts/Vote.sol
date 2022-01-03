@@ -125,15 +125,6 @@ contract Vote {
             // winnerProposalName = proposals[0].name;
             winnerProposalName = "Yes";
             uint energySumAll = org1Sum + org2Sum + org3Sum + org4Sum;
-
-            // uint per1 = energyPercentage[org1];
-            // uint per2 = energyPercentage[org2];
-            // uint per3 = energyPercentage[org3];
-            // uint per4 = energyPercentage[org4];
-            // per1 = calculatePercentage(energySum[org1], energySumAll);
-            // per2 = calculatePercentage(energySum[org2], energySumAll);
-            // per3 = calculatePercentage(energySum[org3], energySumAll);
-            // per4 = calculatePercentage(energySum[org4], energySumAll);
             energyPercentage[org1] = calculatePercentage(org1Sum, energySumAll);
             energyPercentage[org2] = calculatePercentage(org2Sum, energySumAll);
             energyPercentage[org3] = calculatePercentage(org3Sum, energySumAll);
