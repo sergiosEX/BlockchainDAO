@@ -9,8 +9,9 @@
 cd geth_docker_network/
 sudo su
 ./refresh.sh
-! if the docker logs show "looking for peers" multiple times run the script ".refresh.sh" again.
 ```
+
+! if the docker logs show "looking for peers" multiple times run the script ".refresh.sh" again.
 
 ## Step 2 Compile and migrate the contracts
 In a different terminal
@@ -24,7 +25,9 @@ truffle migrate --network geth_docker_network_org4 --reset
 
 ## Step 3 Upload simulated data
 In a different terminal 
-`cd simulation/`
+```bash 
+cd simulation/
+```
 
 run the following sequentialy
 ```bash
