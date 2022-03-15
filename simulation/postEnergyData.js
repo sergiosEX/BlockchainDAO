@@ -37,9 +37,9 @@ postEnergyData = async (orgName) => {
 
 postEnergyDataPerDay = async (lines) => {
     lines.forEach(async line => {
-        let [timestamp, energy] = line.split('\n')[0].split(', ')
+        let [timestamp, declaration, production] = line.split('\n')[0].split(', ')
         try {
-            await EnergyDataInstance.postEnergyData(timestamp, energy, {from: account})
+            await EnergyDataInstance.postEnergyData(timestamp, declaration, production, {from: account})
         } catch(err) {
             console.log("Error in postEnergyData:"+err);
         }

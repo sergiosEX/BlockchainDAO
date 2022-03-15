@@ -29,13 +29,18 @@ contract Vote {
     address org2 = 0xa02A9A8D092a47dc4E7ABf569a9b392D0Ce07e43;
     address org3 = 0x448F178C88C0fC73eA74714b1e0494781548ff4C;
     address org4 = 0x7188D086E0415B0b394a67325Fc5c4534262e76a;
-    uint public org1Sum = 0;
-    uint public org2Sum = 0;
-    uint public org3Sum = 0;
-    uint public org4Sum = 0;
+    uint public org1DeclarationSum = 0;
+    uint public org1ProductionSum = 0;
+    uint public org2DeclarationSum = 0;
+    uint public org2ProductionSum = 0;
+    uint public org3DeclarationSum = 0;
+    uint public org3ProductionSum = 0;
+    uint public org4DeclarationSum = 0;
+    uint public org4ProductionSum = 0;
 
     // my mappings
-    mapping(address => uint) public energyPercentage;
+    mapping(address => uint) public declarationPercentage;
+    mapping(address => uint) public productionPercentage;
     mapping(address => Voter) public voters;
     
     // my modifiers
@@ -45,31 +50,35 @@ contract Vote {
     }
 
     // and finally: my functions()
-    function getEnergyPercentage(address account) public view returns (uint) {
-        return energyPercentage[account];
+    function getEnergyPercentage(address account) public view returns (uint, uint) {
+        return (declarationPercentage[account], productionPercentage[account]);
     }
 
-    function getEnergySum(address account) public view returns (uint) {
+    function getEnergySum(address account) public view returns (uint, uint) {
         if(account == org1){
-            return org1Sum;
+            return (org1DeclarationSum, org1ProductionSum);
         } else if(account == org2){
-            return org2Sum;
+            return (org2DeclarationSum, org2ProductionSum);
         } else if(account == org3){
-            return org3Sum;
+            return (org3DeclarationSum, org3ProductionSum);
         } else if(account == org4){
-            return org4Sum;
+            return (org4DeclarationSum, org4ProductionSum);
         }
     }
 
-    function setEnergySum(uint sum) public {
+    function setEnergySum(uint declarationSum, uint productionSum) public {
         if(msg.sender == org1){
-            org1Sum = sum;
+            org1DeclarationSum = declarationSum;
+            org1ProductionSum = productionSum;
         } else if(msg.sender == org2){
-            org2Sum = sum;
+            org2DeclarationSum = declarationSum;
+            org2ProductionSum = productionSum;
         } else if(msg.sender == org3){
-            org3Sum = sum;
+            org3DeclarationSum = declarationSum;
+            org3ProductionSum = productionSum;
         } else if(msg.sender == org4){
-            org4Sum = sum;
+            org4DeclarationSum = declarationSum;
+            org4ProductionSum = productionSum;
         }
     }
     
@@ -124,11 +133,16 @@ contract Vote {
             voteExists = false;
             // winnerProposalName = proposals[0].name;
             winnerProposalName = "Yes";
-            uint energySumAll = org1Sum + org2Sum + org3Sum + org4Sum;
-            energyPercentage[org1] = calculatePercentage(org1Sum, energySumAll);
-            energyPercentage[org2] = calculatePercentage(org2Sum, energySumAll);
-            energyPercentage[org3] = calculatePercentage(org3Sum, energySumAll);
-            energyPercentage[org4] = calculatePercentage(org4Sum, energySumAll);
+            uint declarationSumAll = org1DeclarationSum + org2DeclarationSum + org3DeclarationSum + org4DeclarationSum;
+            declarationPercentage[org1] = calculatePercentage(org1DeclarationSum, declarationSumAll);
+            declarationPercentage[org2] = calculatePercentage(org2DeclarationSum, declarationSumAll);
+            declarationPercentage[org3] = calculatePercentage(org3DeclarationSum, declarationSumAll);
+            declarationPercentage[org4] = calculatePercentage(org4DeclarationSum, declarationSumAll);
+            uint productionSumAll = org1ProductionSum + org2ProductionSum + org3ProductionSum + org4ProductionSum;
+            productionPercentage[org1] = calculatePercentage(org1ProductionSum, productionSumAll);
+            productionPercentage[org2] = calculatePercentage(org2ProductionSum, productionSumAll);
+            productionPercentage[org3] = calculatePercentage(org3ProductionSum, productionSumAll);
+            productionPercentage[org4] = calculatePercentage(org4ProductionSum, productionSumAll);
             message = "The vote is done. The result is Yes.";
         } else if (proposals[1].voteCount > proposals[0].voteCount + numVotesLeft){
             voteExists = false;
